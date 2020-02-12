@@ -3,6 +3,7 @@ import os
 import io
 import re
 import sys
+import torch
 import random
 import requests
 import unicodedata
@@ -102,4 +103,55 @@ def convert(lang, tensor):
     for t in tensor:
         if t!=0:
             print ("%d ----> %s" % (t, lang.index_word[t]))
-  
+
+            
+            
+def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
+          decoder_optimizer, criterion, device, batch_sz, targ_lang):
+    # Initialize the encoder
+    encoder_hidden = encoder.initialize_hidden_state().to(device)
+    # Put all the previously computed gradients to zero
+    encoder_optimizer.zero_grad()
+    decoder_optimizer.zero_grad()
+
+    target_length = target_tensor.size(1)
+    
+    # Encode the input sentence
+    encoder_outputs, encoder_hidden = encoder(input_tensor, encoder_hidden)
+    
+    #encoder_outputs = encoder_outputs.to(device)
+
+    loss = 0
+    
+    decoder_input = torch.tensor([[targ_lang.word_index['<start>']]] * batch_sz, device=device)
+
+    decoder_hidden = encoder_hidden
+
+    #use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
+    use_teacher_forcing = True
+
+    if use_teacher_forcing:
+        # Teacher forcing: Feed the target as the next input
+        for di in range(1, target_length):
+            decoder_output, decoder_hidden, decoder_attention = decoder(
+                decoder_input, decoder_hidden, encoder_outputs)
+            loss += criterion(decoder_output, target_tensor[:, di])
+            decoder_input = torch.unsqueeze(target_tensor[:, di], 1)  # Teacher forcing
+
+    else:
+        # Without teacher forcing: use its own predictions as the next input
+        pass
+    
+    batch_loss = (loss.item() / int(target_tensor.shape[1]))
+    
+    loss.backward()
+
+    encoder_optimizer.step()
+    decoder_optimizer.step()
+
+    return batch_loss
+
+
+
+def global_trainer():
+    pass

@@ -57,7 +57,9 @@ class Decoder(nn.Module):
         output = output.reshape(-1, output.shape[2])
 
         # output shape == (batch_size, vocab)
-        x = self.fc(output)
+        output = self.fc(output)
+        
+        output = F.log_softmax(output, dim=1)
 
-        return x, state, attention_weights
+        return output, state, attention_weights
         
