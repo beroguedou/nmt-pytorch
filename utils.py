@@ -67,9 +67,10 @@ def create_dataset(path, num_examples):
     # 2. Clean the sentences
     # 3. Return word pairs in the format: [ENGLISH, SPANISH]
     lines = io.open(path, encoding='UTF-8').read().strip().split('\n')
-
+    print("The number of line in the dataset is", len(lines))
     word_pairs = [[preprocess_sentence(w) for w in l.split('\t')]  for l in lines[:num_examples]]
     random.shuffle(word_pairs)
+    
     return zip(*word_pairs)
 
 
@@ -118,13 +119,8 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
     
     # Encode the input sentence
     encoder_outputs, encoder_hidden = encoder(input_tensor, encoder_hidden)
-    
-    #encoder_outputs = encoder_outputs.to(device)
-
     loss = 0
-    
     decoder_input = torch.tensor([[targ_lang.word_index['<start>']]] * batch_sz, device=device)
-
     decoder_hidden = encoder_hidden
 
     #use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
@@ -143,9 +139,7 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
         pass
     
     batch_loss = (loss.item() / int(target_tensor.shape[1]))
-    
     loss.backward()
-
     encoder_optimizer.step()
     decoder_optimizer.step()
 
@@ -153,5 +147,52 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
 
 
 
-def global_trainer():
-    pass
+def evaluate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
+    #attention_plot = np.zeros((max_length_targ, max_length_inp))
+
+    sentence = preprocess_sentence(sentence)
+
+    inputs = [inp_lang.word_index[i] for i in sentence.split(' ')]
+    inputs = tf.keras.preprocessing.sequence.pad_sequences([inputs],
+                                                         maxlen=max_length_inp,
+                                                         padding='post')
+    inputs = torch.tensor(inputs).long().to(device)
+
+    result = ''
+
+    with torch.no_grad():
+        hidden = torch.zeros(1, 1, 1024, device=device)
+        enc_out, enc_hidden = encoder(inputs, hidden)
+
+        dec_hidden = enc_hidden
+        dec_input = torch.tensor([[targ_lang.word_index['<start>']]], device=device)
+
+        for t in range(max_length_targ):
+            predictions, dec_hidden, attention_weights = decoder(dec_input,
+                                                         dec_hidden,
+                                                         enc_out)
+
+            # storing the attention weights to plot later on
+            #attention_weights = tf.reshape(attention_weights, (-1, ))
+            #attention_plot[t] = attention_weights.numpy()
+            topv, topi = predictions.data.topk(1)
+            #predicted_id = tf.argmax(predictions[0]).numpy()
+            result += targ_lang.index_word[topi.item()] + ' '
+
+            if targ_lang.index_word[topi.item()] == '<end>':
+                return result, sentence#, attention_plot
+
+            # the predicted ID is fed back into the model
+
+            dec_input = torch.tensor([topi.item()], device=device).unsqueeze(0)
+
+
+        return result, sentence #, attention_plot
+
+
+def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
+    result, sentence = evaluate(sentence, max_length_targ, max_length_inp, 
+                                                encoder, decoder, inp_lang, targ_lang, device)
+
+    print('Input: %s' % (sentence))
+    print('Predicted translation: {}'.format(result))
