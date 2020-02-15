@@ -1,4 +1,3 @@
-
 import os 
 import io
 import re
@@ -108,7 +107,7 @@ def convert(lang, tensor):
             
             
 def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
-          decoder_optimizer, criterion, device, batch_sz, targ_lang):
+          decoder_optimizer, criterion, device, batch_sz, targ_lang, teacher_forcing_ratio=0.5):
     # Initialize the encoder
     encoder_hidden = encoder.initialize_hidden_state().to(device)
     # Put all the previously computed gradients to zero
@@ -123,11 +122,15 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
     decoder_input = torch.tensor([[targ_lang.word_index['<start>']]] * batch_sz, device=device)
     decoder_hidden = encoder_hidden
 
-    #use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-    use_teacher_forcing = True
+    # Use randomly teacher forcing
+    if random.random() < teacher_forcing_ratio:
+        use_teacher_forcing = True  
+    else:  
+        use_teacher_forcing = False
 
     if use_teacher_forcing:
-        # Teacher forcing: Feed the target as the next input
+        # Teacher forcing: Feed the target as the next input to help the model
+        # in case it starts with the wrong word.
         for di in range(1, target_length):
             decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
@@ -136,7 +139,14 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
 
     else:
         # Without teacher forcing: use its own predictions as the next input
-        pass
+        for di in range(1, target_length):
+            decoder_output, decoder_hidden, decoder_attention = decoder(
+                decoder_input, decoder_hidden, encoder_outputs)
+            loss += criterion(decoder_output, target_tensor[:, di])
+            topv, topi = decoder_output.data.topk(1)
+            # the predicted ID is fed back into the model
+            dec_input = topi.squeeze().detach()
+
     
     batch_loss = (loss.item() / int(target_tensor.shape[1]))
     loss.backward()
@@ -173,14 +183,11 @@ def evaluate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_la
                                                          enc_out)
 
             # storing the attention weights to plot later on
-            #attention_weights = tf.reshape(attention_weights, (-1, ))
-            #attention_plot[t] = attention_weights.numpy()
             topv, topi = predictions.data.topk(1)
-            #predicted_id = tf.argmax(predictions[0]).numpy()
             result += targ_lang.index_word[topi.item()] + ' '
 
             if targ_lang.index_word[topi.item()] == '<end>':
-                return result, sentence#, attention_plot
+                return result, sentence
 
             # the predicted ID is fed back into the model
 
