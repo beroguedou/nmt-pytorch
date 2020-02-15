@@ -128,24 +128,21 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
     else:  
         use_teacher_forcing = False
 
-    if use_teacher_forcing:
-        # Teacher forcing: Feed the target as the next input to help the model
-        # in case it starts with the wrong word.
-        for di in range(1, target_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
+    #if use_teacher_forcing:
+    # Teacher forcing: Feed the target as the next input to help the model
+    # in case it starts with the wrong word.
+    for di in range(1, target_length):
+        decoder_output, decoder_hidden, decoder_attention = decoder(
                 decoder_input, decoder_hidden, encoder_outputs)
-            loss += criterion(decoder_output, target_tensor[:, di])
+        loss += criterion(decoder_output, target_tensor[:, di])
+        if use_teacher_forcing:
             decoder_input = torch.unsqueeze(target_tensor[:, di], 1)  # Teacher forcing
 
-    else:
-        # Without teacher forcing: use its own predictions as the next input
-        for di in range(1, target_length):
-            decoder_output, decoder_hidden, decoder_attention = decoder(
-                decoder_input, decoder_hidden, encoder_outputs)
-            loss += criterion(decoder_output, target_tensor[:, di])
+        else:
+            # Without teacher forcing: use its own predictions as the next input
             topv, topi = decoder_output.data.topk(1)
             # the predicted ID is fed back into the model
-            dec_input = topi.squeeze().detach()
+            decoder_input = topi.detach()
 
     
     batch_loss = (loss.item() / int(target_tensor.shape[1]))
@@ -158,7 +155,6 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
 
 
 def evaluate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
-    #attention_plot = np.zeros((max_length_targ, max_length_inp))
 
     sentence = preprocess_sentence(sentence)
 
