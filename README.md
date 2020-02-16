@@ -1,4 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
 
 <h1> NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND TRANSLATE </h1>
@@ -18,3 +17,6 @@ $\begin{align}
     E_0 &= mc^2 \\
     E &= \frac{mc^2}{\sqrt{1-\frac{v^2}{c^2}}}
 \end{align}
+
+h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
+
