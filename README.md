@@ -12,12 +12,13 @@ La traduction automatique de textes grâce à des réseaux de neurones (Natural 
 Le papier propose une architecture performante de réseau de neurones dite: encodeur-attention-décodeur qui permet lors de la traduction d'un mot de se focaliser sur les groupes de mots dans la séquence d'entrée les plus importants définissant un contexte pour le mot à traduire. Ce méchanisme est appelé méchanisme d'attention et permet d'obtenir des performances remarquables même en présence de très longues phrases à traduire.
 
 Supposons que nous avons une séquence en espagnol (phrase source) que nous voulons traduire vers l'anglais(phrase cible). Dans les architectures traditionnelles d'encodeur-décodeur précédent ce papier, l'encodeur lit la phrase source qui est représentée mathématiquement comme la séquence
-<div> <img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" /> </div>
+<img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" />
 avec
-<img src="https://latex.codecogs.com/svg.latex?T_{x}" title="T_{x}" />
+<img src="https://latex.codecogs.com/svg.latex?T_{X}" title="T_{X}" />
 étant la longueur de la phrase (le nombre de mots). Et la représente en un contexte C. Généralement on utilise un RNN (réseau de neurone récurrent) qui produit les sorties:
 <img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1})" />
 et le contexte:
-<img src="https://latex.codecogs.com/svg.latex?C&space;=&space;q(\left&space;\{&space;h_{1},&space;...,&space;h_{T}&space;\right&space;\})" title="C = q(\left \{ h_{1}, ..., h_{T} \right \})" />
+<img src="https://latex.codecogs.com/svg.latex?C&space;=&space;q(\left&space;\{&space;h_{1},&space;...,&space;h_{T}&space;\right&space;\})" title="C = q(\left \{ h_{1}, ..., h_{T_{X} \right \})" />
+f et q sont des fonctions non-linéaires telles que: 
+<img src="https://latex.codecogs.com/svg.latex?f&space;=&space;LSTM" title="f = LSTM" /> et <img src="https://latex.codecogs.com/svg.latex?q(\left&space;\{&space;h_{1},&space;...&space;,h_{T}&space;\right&space;\})&space;=&space;h_{T}" title="q(\left \{ h_{1}, ... ,h_{T} \right \}) = h_{T}" />
 
-f et q sont des fonctions non-linéaires telles que:
