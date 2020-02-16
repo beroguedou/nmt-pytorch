@@ -21,4 +21,4 @@ et le contexte:
 
 f et q sont des fonctions non-linéaires telles que:
 
-<img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})&space;h_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1}) h_{t} = f(X_{t}, h_{t-1})" />
+<img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})&space;v_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1}) v_{t} = f(X_{t}, h_{t-1})" />
