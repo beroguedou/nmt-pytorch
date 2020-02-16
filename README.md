@@ -11,5 +11,8 @@ La traduction automatique de textes grâce à des réseaux de neurones (Natural 
 
 Le papier propose une architecture performante de réseau de neurones dite: encodeur-attention-décodeur qui permet lors de la traduction d'un mot de se focaliser sur les groupes de mots dans la séquence d'entrée les plus importants définissant un contexte pour le mot à traduire. Ce méchanisme est appelé méchanisme d'attention et permet d'obtenir des performances remarquables même en présence de très longues phrases à traduire.
 
-Supposons que nous avons une séquence en espagnol (phrase source) que nous voulons traduire vers l'anglais(phrase cible). Dans les architectures traditionnelles d'encodeur-décodeur précédent ce papier, l'encodeur lit la phrase source qui est représentée mathématiquement comme la séquence: <img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" />, avec 
+Supposons que nous avons une séquence en espagnol (phrase source) que nous voulons traduire vers l'anglais(phrase cible). Dans les architectures traditionnelles d'encodeur-décodeur précédent ce papier, l'encodeur lit la phrase source qui est représentée mathématiquement comme la séquence: 
+<img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" />
+avec 
+<a href="https://www.codecogs.com/eqnedit.php?latex=T_{x}" target="_blank"><img src="https://latex.codecogs.com/svg.latex?T_{x}" title="T_{x}" /></a>
 
