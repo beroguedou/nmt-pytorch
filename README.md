@@ -1,5 +1,5 @@
-<h1 style="color:rgb(255,0,0);"> NEURAL </h1>
-# nmt-pytorch 
+<h1> NEURAL </h1>
+##nmt-pytorch 
 
 
 La version pytorch du tutoriel sur la traduction automatique de textes de tensorflow à l'aide de réseau de neurones. Vous pouvez trouver la version originale <a href="https://www.tensorflow.org/tutorials/text/nmt_with_attention">ici</a>.
