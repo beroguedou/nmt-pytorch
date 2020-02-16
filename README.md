@@ -22,4 +22,6 @@ avec
 
 et le contexte:
 
+<img src="https://latex.codecogs.com/svg.latex?C&space;=&space;q(\left&space;\{&space;h_{1},&space;...,&space;h_{T}&space;\right&space;\})" title="C = q(\left \{ h_{1}, ..., h_{T} \right \})" />
+
 f et q sont des fonctions non-linéaires telles que:
