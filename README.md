@@ -1,4 +1,4 @@
-<h1 style="color:red;"> NEURAL </h1>
+<h1 style="color:rgb(255,0,0);"> NEURAL </h1>
 # nmt-pytorch 
 
 
