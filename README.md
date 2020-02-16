@@ -19,5 +19,7 @@ avec
 <img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1})" /> et le contexte:
 <img src="https://latex.codecogs.com/svg.latex?C&space;=&space;q(\left&space;\{&space;h_{1},&space;...,&space;h_{T}&space;\right&space;\})" title="C = q(\left \{ h_{1}, ..., h_{T_{X} \right \})" /> 
 f et q sont des fonctions non-linéaires telles que:  
-<img src="https://latex.codecogs.com/svg.latex?f&space;=&space;LSTM" title="f = LSTM" /> et <img src="https://latex.codecogs.com/svg.latex?q(\left&space;\{&space;h_{1},&space;...&space;,h_{T}&space;\right&space;\})&space;=&space;h_{T}" title="q(\left \{ h_{1}, ... ,h_{T} \right \}) = h_{T}" />
+<img src="https://latex.codecogs.com/svg.latex?f&space;=&space;LSTM" title="f = LSTM" /> et <img src="https://latex.codecogs.com/svg.latex?q(\left&space;\{&space;h_{1},&space;...&space;,h_{T}&space;\right&space;\})&space;=&space;h_{T}" title="q(\left \{ h_{1}, ... ,h_{T} \right \}) = h_{T}" />.
+
+Le décodeur quant à lui
 
