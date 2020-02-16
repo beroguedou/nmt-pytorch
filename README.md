@@ -14,5 +14,5 @@ Le papier propose une architecture performante de réseau de neurones dite: enco
 Supposons que nous avons une séquence en espagnol (phrase source) que nous voulons traduire vers l'anglais(phrase cible). Dans les architectures traditionnelles d'encodeur-décodeur précédent ce papier, l'encodeur lit la phrase source qui est représentée mathématiquement comme la séquence:
 
 
-<img src="https://latex.codecogs.com/svg.latex?x&space;=&space;(x_{1},&space;x_{2},...,&space;x_{T_{x}})" title="x = (x_{1}, x_{2},..., x_{T_{x}})" />
+<img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" />
 
