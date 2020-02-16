@@ -17,8 +17,8 @@ avec
 <div>  <a href="https://www.codecogs.com/eqnedit.php?latex=T_{x}" target="_blank"><img src="https://latex.codecogs.com/svg.latex?T_{x}" title="T_{x}" /></a> </div>
 étant la longueur de la phrase (le nombre de mots). Et la représente en un contexte C. Généralement on utilise un RNN (réseau de neurone récurrent) qui produit les sorties:
 
+<img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1})" />
+
 et le contexte:
 
 f et q sont des fonctions non-linéaires telles que:
-
-<img src="https://latex.codecogs.com/svg.latex?h_{t}&space;=&space;f(X_{t},&space;h_{t-1})&space;v_{t}&space;=&space;f(X_{t},&space;h_{t-1})" title="h_{t} = f(X_{t}, h_{t-1}) v_{t} = f(X_{t}, h_{t-1})" />
