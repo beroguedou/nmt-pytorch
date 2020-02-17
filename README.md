@@ -60,7 +60,12 @@ Pour le décodeur on passe en pratique la concaténation de <img src="https://la
 
 Selon le papier ils ont ensuite passé la sortie du RNN à une couche de maxout units puis normaliser avec un softmax pour avoir les probabilités sur l'espace défini par le vocabulaire de la langue d'arrivée.
 
-Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qui utilise une fonction d'activation  appelée maxout unit. Etant donnée une entrée <img src="https://latex.codecogs.com/svg.latex?x&space;\epsilon&space;\mathbb{R}^{d}" title="x \epsilon \mathbb{R}^{d}" /> on compute <img src="https://latex.codecogs.com/svg.latex?Z_{ij}&space;=&space;X^{T}W_{ij}&space;&plus;&space;b_{ij}" title="Z_{ij} = X^{T}W_{ij} + b_{ij}" /> (ce qui revient à passer X dans une couche dense !) puis on applique la fonction d'activation appelée maxout unit <img src="https://latex.codecogs.com/svg.latex?h_{i}(X)&space;=&space;max_{j\epsilon&space;[1,&space;k]}Z_{ij}" title="h_{i}(X) = max_{j\epsilon [1, k]}Z_{ij}" />
+Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qui utilise une fonction d'activation  appelée maxout unit. Etant donnée une entrée <img src="https://latex.codecogs.com/svg.latex?x&space;\epsilon&space;\mathbb{R}^{d}" title="x \epsilon \mathbb{R}^{d}" /> on compute <img src="https://latex.codecogs.com/svg.latex?Z_{ij}&space;=&space;X^{T}W_{ij}&space;&plus;&space;b_{ij}" title="Z_{ij} = X^{T}W_{ij} + b_{ij}" /> (ce qui revient à passer X dans une couche dense !) puis on applique la fonction d'activation appelée maxout unit:
+<div>
+<img src="https://latex.codecogs.com/svg.latex?h_{i}(X)&space;=&space;max_{j\epsilon&space;[1,&space;k]}Z_{ij}" title="h_{i}(X) = max_{j\epsilon [1, k]}Z_{ij}" />
+</div>
+
+Ian GOODFELLOW et Yoshua BENGION ont démontré que c'est un approximateur universel. Mais l'incovénient est qu'il double le nombre de paramètres donc j'utiliserai plutôt une Relu à la place.
 
 
 
