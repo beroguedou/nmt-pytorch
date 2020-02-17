@@ -34,6 +34,11 @@ Le papier est innovant en ce qu'il propose de définir chaque probabilité condi
 L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN à une seule direction dans ce projet. Cet encodeur "mappe" une séquence d'entrée <img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" /> en une séquence d'annotations <img src="https://latex.codecogs.com/svg.latex?(h_{1},&space;h_{2},...,&space;h_{T_{X}})" title=" (h_{1}, h_{2},..., h_{T_{X}})" /> bidirectionnelle. C'est-dire que chaque <img src="https://latex.codecogs.com/svg.latex?h_{i}" title="h_{i}" /> est obtenu par concaténation du forward pass et du bacward pass du RNN et contient de l'information sur toute la séquence avec un grand focus sur le i-ème élément de la séquence d'entrée.
 
 
+<h4> Le décodeur avec méchanisme d'attention: </h4>
+
+Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. 
+
+
 
 
 
