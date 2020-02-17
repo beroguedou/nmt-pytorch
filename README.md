@@ -3,10 +3,12 @@
 <h1> NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND TRANSLATE </h1>
 
 <h3> Contexte: </h3>
+<p>
 Ce projet propose une explication simple mais surtout en français du papier "NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND TRANSLATE" de Dzmitry BAHDANAU, Kyung Hyun CHO et de Yoshua BENGIO. Il apporte aussi une implémentation de ce papier en adaptant une version pytorch revisitée du tutoriel sur la traduction automatique (de textes espagnol vers des textes en anglais de tensorflow) à l'aide de réseau de neurones. Vous pouvez trouver la version originale du tutoriel <a href="https://www.tensorflow.org/tutorials/text/nmt_with_attention">ici</a>. Quant au papier vous pouvez le trouver <a href="https://arxiv.org/abs/1409.0473">ici</a>.
+</p>
 
 <h3> Ce que vous pouvez retenir du papier: </h3>
-
+<p>
 La traduction automatique de textes grâce à des réseaux de neurones (Natural Machine Translation en anglais ou NMT en abrégé) est une approche de plus en plus en vogue. Son but est de permettre d'obtenir une traduction de qualité avec un seul composant (grand réseau de neurones) qui lit à la fois le texte d'entrée et le traduit dans la langue d'arrivée. Ce qui se différencie de la traduction statistique traditionnelle. 
 
 Le papier propose une architecture performante de réseau de neurones dite: encodeur-attention-décodeur qui permet lors de la traduction d'un mot de se focaliser sur les groupes de mots dans la séquence d'entrée les plus importants définissant un contexte pour le mot à traduire. Ce méchanisme est appelé méchanisme d'attention et permet d'obtenir des performances remarquables même en présence de très longues phrases à traduire.
@@ -29,6 +31,7 @@ où  <img src="https://latex.codecogs.com/svg.latex?y&space;=&space;(y_{1},&spac
 Avec un RNN dans le décodeur on modélise chaque probabilté conditionnelle comme : <img src="https://latex.codecogs.com/svg.latex?p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\},&space;C)&space;=&space;g(y_{i-1},&space;S_{i},&space;C)" title="p(y_{t}/\left \{ y_{1}, ... ,y_{t-1} \right \}, C) = g(y_{i-1}, S_{i}, C)" /> (le mot qui vient d'être prédit, les états cachés correspondant au mot à prédire et tout le vecteur contexte C). La fonction g est non linéaire délivrant la probabilié <img src="https://latex.codecogs.com/svg.latex?y_{t}" title="y_{t}" /> et <img src="https://latex.codecogs.com/svg.latex?S_{t}" title="S_{t}" /> étant l'état caché du RNN.
 
 Le papier est innovant en ce qu'il propose de définir chaque probabilité conditionnelle comme  : <img src="https://latex.codecogs.com/svg.latex?p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\},&space;C)&space;=&space;g(y_{i-1},&space;S_{i},&space;C)" title="p(y_{t}/\left \{ y_{1}, ... ,y_{t-1} \right \}, C) = g(y_{i-1}, S_{i}, C)" /> où <img src="https://latex.codecogs.com/svg.latex?C_{i}" title="C_{i}" /> est désormais un vecteur contexte dynamique (donc non statique comme précédemment) et dépendant du mot <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> à prédire.
+</p>
 
 <h4> L'encodeur: </h4>
 <p>
@@ -38,8 +41,10 @@ L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN 
 
 
 <h4> Le décodeur avec méchanisme d'attention: </h4>
-
+<p>
 Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. 
+  
+<p>
 
 
 
