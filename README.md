@@ -44,10 +44,17 @@ L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN 
 <p>
 Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. <img src="https://latex.codecogs.com/svg.latex?S_{i-1}" title="S_{i-1}" /> est l'état caché du RNN avant d'émettre  <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> .
 <p>
-  
+
+<img src="https://latex.codecogs.com/svg.latex?a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)&space;=&space;v_{a}^{T}tanh(W_{a}S_{i-1}&space;&plus;&space;U_{a}h_{j}])" title="a\left ( S_{i-1}, h_{j} \right ) = v_{a}^{T}tanh(W_{a}S_{i-1} + U_{a}h_{j}])" />
+Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est évalué <img src="https://latex.codecogs.com/svg.latex?T_{x}*T_{y}" title="T_{x}*T_{y}" /> pour chaque paire phrase source - phrase cible.
+
 <img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
 
-<img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> avec <img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
+<img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> 
+
+<img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
+
+Pour le décodeur on passe en pratique 
 
 
 
