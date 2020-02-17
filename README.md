@@ -47,12 +47,14 @@ Les équations suivantes sont computées : <img src="https://latex.codecogs.com/
 
 <img src="https://latex.codecogs.com/svg.latex?a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)&space;=&space;v_{a}^{T}tanh(W_{a}S_{i-1}&space;&plus;&space;U_{a}h_{j}])" title="a\left ( S_{i-1}, h_{j} \right ) = v_{a}^{T}tanh(W_{a}S_{i-1} + U_{a}h_{j}])" />
 Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est évalué <img src="https://latex.codecogs.com/svg.latex?T_{x}*T_{y}" title="T_{x}*T_{y}" /> pour chaque paire phrase source - phrase cible.
-
+<div>
 <img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
+</div>
 
 <img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> 
-
+<div>
 <img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
+</div>
 
 Pour le décodeur on passe en pratique 
 
