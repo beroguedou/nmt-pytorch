@@ -31,10 +31,10 @@ Avec un RNN dans le décodeur on modélise chaque probabilté conditionnelle com
 Le papier est innovant en ce qu'il propose de définir chaque probabilité conditionnelle comme  : <img src="https://latex.codecogs.com/svg.latex?p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\},&space;C)&space;=&space;g(y_{i-1},&space;S_{i},&space;C)" title="p(y_{t}/\left \{ y_{1}, ... ,y_{t-1} \right \}, C) = g(y_{i-1}, S_{i}, C)" /> où <img src="https://latex.codecogs.com/svg.latex?C_{i}" title="C_{i}" /> est désormais un vecteur contexte dynamique (donc non statique comme précédemment) et dépendant du mot <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> à prédire.
 
 <h4> L'encodeur: </h4>
-<div>
+<p>
 L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN à une seule direction dans ce projet. Cet encodeur "mappe" une séquence d'entrée <img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" /> en une séquence d'annotations <img src="https://latex.codecogs.com/svg.latex?(h_{1},&space;h_{2},...,&space;h_{T_{X}})" title=" (h_{1}, h_{2},..., h_{T_{X}})" /> bidirectionnelle. Et chaque <img src="https://latex.codecogs.com/svg.latex?h_{i}" title="h_{i}" /> est obtenu par concaténation du forward pass et du bacward pass du RNN et contient de l'information sur toute la séquence avec un grand focus sur le i-ème élément de la séquence d'entrée.
   
-</div>
+</p>
 
 
 <h4> Le décodeur avec méchanisme d'attention: </h4>
