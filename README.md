@@ -30,5 +30,7 @@ Avec un RNN dans le décodeur on modélise chaque probabilté conditionnelle com
 
 Le papier est innovant en ce qu'il propose de définir chaque probabilité conditionnelle comme  : <img src="https://latex.codecogs.com/svg.latex?p\left&space;(&space;y_{t}&space;/&space;\left&space;\{&space;y_{1},&space;...&space;,y_{T_{t-1}}&space;\right&space;\},&space;C\right&space;)&space;=&space;g(y_{t-1},&space;S_{t},&space;C)" title="p\left ( y_{i} / \left \{ y_{1}, ... ,y_{T_{i-1}} \right \}, C\right ) = g(y_{i-1}, S_{i}, C)" /> où <img src="https://latex.codecogs.com/svg.latex?C_{i}" title="C_{i}" /> est désormais un vecteur contexte dynamique (donc non statique comme précédemment) et dépendant du mot <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> à prédire.
 
+L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN à une seule direction dans ce projet. Cet encodeur "mappe" une séquence d'entrée <img src="https://latex.codecogs.com/svg.latex?X&space;=&space;(X_{1},&space;X_{2},...,&space;X_{T_{X}})" title="X = (X_{1}, X_{2},..., X_{T_{X}})" /> en une séquence d'annotation <img src="https://latex.codecogs.com/svg.latex?(h_{1},&space;h_{2},...,&space;h_{T_{X}})" title=" (h_{1}, h_{2},..., h_{T_{X}})" />
+
 
 
