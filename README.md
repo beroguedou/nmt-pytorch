@@ -42,7 +42,9 @@ L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN 
 
 <h4> Le décodeur avec méchanisme d'attention: </h4>
 <p>
-Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. 
+Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. <img src="https://latex.codecogs.com/svg.latex?S_{i-1}" title="S_{i-1}" /> est l'état caché du RNN avant d'émettre  <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> .
+ 
+<img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
   
 <p>
 
