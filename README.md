@@ -46,6 +46,12 @@ Les équations suivantes sont computées : <img src="https://latex.codecogs.com/
 <p>
   
 <img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
+
+<img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> avec <img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
+
+
+
+
   
 
 
