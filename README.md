@@ -56,7 +56,7 @@ Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est
 <img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
 </div>
 
-Pour le décodeur on passe en pratique 
+Pour le décodeur on passe en pratique la concaténation de <img src="https://latex.codecogs.com/svg.latex?y_{i-1}" title="y_{i-1}" /> et de <img src="https://latex.codecogs.com/svg.latex?C_{i}" title="C_{i}" /> a un RNN (GRU) dont l'état est <img src="https://latex.codecogs.com/svg.latex?S_{i-1}" title="S_{i-1}" /> pour prédire <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" />.
 
 
 
