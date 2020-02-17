@@ -23,7 +23,8 @@ f et q sont des fonctions non-linéaires telles que:
 
 Le décodeur quant à lui est entrainé pour prédire le prochain mot <img src="https://latex.codecogs.com/svg.latex?y_{t}" title="y_{t}" /> connaissant le vecteur contexte C et et tous les mots déja prédits <img src="https://latex.codecogs.com/svg.latex?\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\}" title="\left \{ y_{1}, ... ,y_{t-1} \right \}" />. En d'autres termes la phrase cible est modélisée par une probabilité jointe sur tous ses mots qui peut s'écrire: 
 
-<img src="https://latex.codecogs.com/svg.latex?p(y)&space;=&space;\prod_{t=1}^{T_{y}}&space;p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1},&space;C)&space;\right&space;\}" title="p(y) = \prod_{t=1}^{T_{y}} p(y_{t}/\left \{ y_{1}, ... ,y_{t-1}, C) \right \}" /> où <img src="https://latex.codecogs.com/svg.latex?y&space;=&space;(y_{1},&space;...&space;,y_{T_{y}})" title="y = (y_{1}, ... ,y_{T_{y}})" />.
+<img src="https://latex.codecogs.com/svg.latex?p(y)&space;=&space;\prod_{t=1}^{T_{y}}&space;p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1},&space;C)&space;\right&space;\}" title="p(y) = \prod_{t=1}^{T_{y}} p(y_{t}/\left \{ y_{1}, ... ,y_{t-1}, C) \right \}" /> 
+où <img src="https://latex.codecogs.com/svg.latex?y&space;=&space;(y_{1},&space;...&space;,y_{T_{y}})" title="y = (y_{1}, ... ,y_{T_{y}})" />.
 
 Avec un RNN dans le décodeur on modélise:
 
