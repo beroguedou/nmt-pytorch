@@ -26,7 +26,7 @@ Le décodeur quant à lui est entrainé pour prédire le prochain mot <img src="
 <img src="https://latex.codecogs.com/svg.latex?p(y)&space;=&space;\prod_{t=1}^{T_{y}}&space;p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1},&space;C)&space;\right&space;\}" title="p(y) = \prod_{t=1}^{T_{y}} p(y_{t}/\left \{ y_{1}, ... ,y_{t-1}, C) \right \}" /> 
 où <img src="https://latex.codecogs.com/svg.latex?y&space;=&space;(y_{1},&space;...&space;,y_{T_{y}})" title="y = (y_{1}, ... ,y_{T_{y}})" />.
 
-Avec un RNN dans le décodeur on modélise:
+Avec un RNN dans le décodeur on modélise chaque probabilté conditionnelle comme : <img src="https://latex.codecogs.com/svg.latex?p\left&space;(&space;y_{t}&space;/&space;\left&space;\{&space;y_{1},&space;...&space;,y_{T_{t-1}}&space;\right&space;\},&space;C\right&space;)&space;=&space;g(y_{t-1},&space;S_{t},&space;C)" title="p\left ( y_{t} / \left \{ y_{1}, ... ,y_{T_{t-1}} \right \}, C\right ) = g(y_{t-1}, S_{t}, C)" />
 
 
 
