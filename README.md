@@ -58,6 +58,12 @@ Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est
 
 Pour le décodeur on passe en pratique la concaténation de <img src="https://latex.codecogs.com/svg.latex?y_{i-1}" title="y_{i-1}" /> et de <img src="https://latex.codecogs.com/svg.latex?C_{i}" title="C_{i}" /> a un RNN (GRU) dont l'état est <img src="https://latex.codecogs.com/svg.latex?S_{i-1}" title="S_{i-1}" /> pour prédire <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" />.
 
+Selon le papier ils ont ensuite passé la sortie du RNN à une couche de maxout units puis normaliser avec un softmax pour avoir les probabilités sur l'espace défini par le vocabulaire de la langue d'arrivée.
+
+Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qui utilise une fonction d'activation  appelée maxout unit. Etant donnée une entrée <img src="https://latex.codecogs.com/svg.latex?x&space;\epsilon&space;\mathbb{R}^{d}" title="x \epsilon \mathbb{R}^{d}" /> on compute <img src="https://latex.codecogs.com/svg.latex?Z_{ij}&space;=&space;X^{T}W_{ij}&space;&plus;&space;b_{ij}" title="Z_{ij} = X^{T}W_{ij} + b_{ij}" />
+
+
+
 
 
 
