@@ -23,6 +23,8 @@ avec
 f et q sont des fonctions non-linéaires telles que:  
 <img src="https://latex.codecogs.com/svg.latex?f&space;=&space;LSTM" title="f = LSTM" /> et <img src="https://latex.codecogs.com/svg.latex?q(\left&space;\{&space;h_{1},&space;...&space;,h_{T}&space;\right&space;\})&space;=&space;h_{T}" title="q(\left \{ h_{1}, ... ,h_{T} \right \}) = h_{T}" />.
 
+<img src="Image1.png"/> 
+
 Le décodeur quant à lui est entrainé pour prédire le prochain mot <img src="https://latex.codecogs.com/svg.latex?y_{t}" title="y_{t}" /> connaissant le vecteur contexte C et et tous les mots déja prédits <img src="https://latex.codecogs.com/svg.latex?\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\}" title="\left \{ y_{1}, ... ,y_{t-1} \right \}" />. En d'autres termes la phrase cible est modélisée par une probabilité jointe sur tous ses mots qui peut s'écrire: 
 
 <img src="https://latex.codecogs.com/svg.latex?p(y)&space;=&space;\prod_{t=1}^{T_{y}}&space;p(y_{t}/\left&space;\{&space;y_{1},&space;...&space;,y_{t-1}&space;\right&space;\},&space;C)" title="p(y) = \prod_{t=1}^{T_{y}} p(y_{t}/\left \{ y_{1}, ... ,y_{t-1} \right \}, C)" />
@@ -39,7 +41,6 @@ L'encodeur est simplement un RNN bdirectionnel même si nous utiliserons un RNN 
   
 </p>
 
-
 <h4> Le décodeur avec méchanisme d'attention: </h4>
 <p>
 Les équations suivantes sont computées : <img src="https://latex.codecogs.com/svg.latex?e_{ij}&space;=&space;a\left&space;(&space;S_{i-1},&space;h_{j}&space;\right&space;)" title="e_{ij} = a\left ( S_{i-1}, h_{j} \right )" /> où "a" est une fonction d'attention qui score comment les inputs autour du j-ème élément de la séquence d'entrée et l'output de la position i matchent. <img src="https://latex.codecogs.com/svg.latex?S_{i-1}" title="S_{i-1}" /> est l'état caché du RNN avant d'émettre  <img src="https://latex.codecogs.com/svg.latex?y_{i}" title="y_{i}" /> .
@@ -51,7 +52,7 @@ Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est
 <img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
 </div>
 
-<img src="Image1.png"/> 
+
 
 <img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> 
 <div>
