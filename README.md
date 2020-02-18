@@ -68,7 +68,7 @@ Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qu
 <img src="https://latex.codecogs.com/svg.latex?h_{i}(X)&space;=&space;max_{j\epsilon&space;[1,&space;k]}Z_{ij}" title="h_{i}(X) = max_{j\epsilon [1, k]}Z_{ij}" />
 </div>
 
-Ian GOODFELLOW et Yoshua BENGION ont démontré que c'est un approximateur universel. Mais l'incovénient est qu'il double le nombre de paramètres donc j'utiliserai plutôt une Relu à la place.
+Ian GOODFELLOW et Yoshua BENGIO ont démontré que c'est un approximateur universel. Mais l'incovénient est qu'il double le nombre de paramètres donc j'utiliserai plutôt une Relu à la place.
 
 
 
