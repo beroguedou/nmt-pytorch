@@ -51,6 +51,8 @@ Les auteurs ont choisi un MLP pour des raisons de computation car le modèle est
 <img src="https://latex.codecogs.com/svg.latex?\alpha&space;_{ij}&space;=&space;\frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" title="\alpha _{ij} = \frac{exp(e_{ij})}{\sum_{k=1}^{T_{x}}exp(e_{ik})}" />
 </div>
 
+<img src="Image1.png"/> 
+
 <img src="https://latex.codecogs.com/svg.latex?C_{i}&space;=&space;\sum_{j=1}^{T_{x}}&space;\alpha&space;_{ij}h_{j}" title="C_{i} = \sum_{j=1}^{T_{x}} \alpha _{ij}h_{j}" /> 
 <div>
 <img src="https://latex.codecogs.com/svg.latex?h_{j}&space;=&space;\left&space;\lfloor&space;\overrightarrow{h_{j}};&space;\overleftarrow{h_{j}}&space;\right&space;\rfloor" title="h_{j} = \left \lfloor \overrightarrow{h_{j}}; \overleftarrow{h_{j}} \right \rfloor" />
@@ -66,6 +68,9 @@ Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qu
 </div>
 
 Ian GOODFELLOW et Yoshua BENGION ont démontré que c'est un approximateur universel. Mais l'incovénient est qu'il double le nombre de paramètres donc j'utiliserai plutôt une Relu à la place.
+
+
+
 
 
 
