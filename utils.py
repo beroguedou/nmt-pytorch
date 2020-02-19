@@ -3,6 +3,7 @@ import io
 import re
 import sys
 import torch
+import queue
 import random
 import requests
 import unicodedata
@@ -199,3 +200,46 @@ def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_l
 
     print('Input: %s' % (sentence))
     print('Predicted translation: {}'.format(result))
+    
+    
+    
+class BeamNode(object):
+    """
+    """
+    def __init__(self, previous_node, log_proba, length, word_id):
+        """
+        """
+        self.previous_node = previous_node
+        self.log_proba = log_proba
+        self.length = length
+        self.word_id = word_id
+        
+    
+    def eval_proba(self, alpha=0.7):
+        """
+        """
+        proba = log_proba / (length -1 + 1e-07)** alpha
+        return proba
+        
+    
+    
+
+class BeamTreeDephtLevel(object):
+    """
+    """
+    def __init__(self, previous_level):
+        """
+        """
+        self.nodes_list = []
+        self.previous_level = previous_level
+    
+    def add_node(self, node):
+        """
+        """
+        self.nodes_list.append(node)
+        
+        
+    
+    
+    
+    
