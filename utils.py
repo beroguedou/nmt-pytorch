@@ -105,7 +105,7 @@ def convert(lang, tensor):
         if t!=0:
             print ("%d ----> %s" % (t, lang.index_word[t]))
 
-            
+
             
 def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
           decoder_optimizer, criterion, device, batch_sz, targ_lang, teacher_forcing_ratio=0.5):
@@ -153,9 +153,14 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
 
     return batch_loss
 
+    
+    
+    
+    
 
 
-def evaluate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
+        
+def greedy_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
 
     sentence = preprocess_sentence(sentence)
 
@@ -191,55 +196,152 @@ def evaluate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_la
             dec_input = torch.tensor([topi.item()], device=device).unsqueeze(0)
 
 
-        return result, sentence #, attention_plot
+        return result, sentence 
 
 
-def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device):
-    result, sentence = evaluate(sentence, max_length_targ, max_length_inp, 
-                                                encoder, decoder, inp_lang, targ_lang, device)
-
-    print('Input: %s' % (sentence))
-    print('Predicted translation: {}'.format(result))
+class BeamTreeNode(object):
     
-    
-    
-class BeamNode(object):
-    """
-    """
+    nbr = 0
     def __init__(self, previous_node, log_proba, length, word_id):
-        """
-        """
+        
+        self.__class__.nbr += 1
         self.previous_node = previous_node
         self.log_proba = log_proba
         self.length = length
         self.word_id = word_id
-        
+ 
     
     def eval_proba(self, alpha=0.7):
-        """
-        """
-        proba = log_proba / (length -1 + 1e-07)** alpha
+
+        proba = self.log_proba / (self.length -1 + 1e-07)** alpha
         return proba
         
     
+class BeamTreeMates(object):
     
-
-class BeamTreeDephtLevel(object):
-    """
-    """
-    def __init__(self, previous_level):
-        """
-        """
+    nbr = 0
+    
+    def __init__(self, parent_node):
+        self.__class__.nbr += 1
         self.nodes_list = []
-        self.previous_level = previous_level
+        self.parent_node = parent_node
+        
     
     def add_node(self, node):
-        """
-        """
+
         self.nodes_list.append(node)
         
+
+class BeamTreeDephtLevel(object):
+    
+    nbr = 0
+    
+    def __init__(self, previous_level):
+        self.__class__.nbr += 1
+        self.mates_list = []
+        self.previous_level = previous_level
+    
+    def add_mate(self, mates):
+
+        self.mates_list.append(mates)
+            
+    
+    
+    
+def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device, beam_width):
+
+    sentence = preprocess_sentence(sentence)
+
+    inputs = [inp_lang.word_index[i] for i in sentence.split(' ')]
+    inputs = tf.keras.preprocessing.sequence.pad_sequences([inputs],
+                                                         maxlen=max_length_inp,
+                                                         padding='post')
+    inputs = torch.tensor(inputs).long().to(device)
+
+    result = ''
+
+    with torch.no_grad():
+        hidden = torch.zeros(1, 1, 1024, device=device)
+        enc_out, enc_hidden = encoder(inputs, hidden)
+
+        dec_hidden = enc_hidden
+        dec_input = torch.tensor([[targ_lang.word_index['<start>']]], device=device)
         
+        
+        # Créer un depth level de départ
+        depth_level = BeamTreeDephtLevel(previous_level=None)
+        # Créer un noeud de départ 
+        node = BeamTreeNode(previous_node=None, log_proba=0, length=1, word_id=targ_lang.word_index['<start>'])
+        # Créer un mate de départ
+        mate = BeamTreeMates(parent_node=node)
+        
+        # Ajouter le noeud au mate
+        mate.add_node(node)
+        # Ajouter le mate au depth level 
+        depth_level.add_mate(mate)
+        
+        # Pour chaque mot à prédire
+        for t in range(max_length_targ):
+            print('\t')
+            # Créer un niveau de profondeur
+            depth_level = BeamTreeDephtLevel(previous_level=depth_level)
+            # pour chaque mate du niveau de profondeur précédent de l'arbre  
+            for mate in depth_level.previous_level.mates_list:
+                # pour chaque moeud dans ce mate
+                for node in mate.nodes_list:
+                    
+                    # Prédire beam_width éléments pour chaque noeud
+                    predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)
+                    top_width_values, top_width_indexes = predictions.data.topk(beam_width)
+                    # Créer un mate 
+                    mate = BeamTreeMates(parent_node=node)
+                    # Pour chaque mot prédit créer un noeud puis rajouter le noeud au mate
+                    for p, w in zip(top_width_values[0], top_width_indexes[0]):
+                        log_proba = node.eval_proba() - p.item()
+                        wordid = w.item()
+                        length = max_length_targ
+                        print(log_proba)
+                        #print(mate.parent_node)
+                        n = BeamTreeNode(previous_node=mate.parent_node, log_proba=0, 
+                                         length=1, word_id=targ_lang.word_index['<start>'])
+                        
+                        mate.add_node(n)
+                        
+                    # Ajouter le mate au depth level actuel
+                    depth_level.add_mate(mate)
+            
+                        
+                        
+                        
+                        
+                        
+            if t == 2:
+                break
+            
+            #result += targ_lang.index_word[topi.item()] + ' '
+
+            #if targ_lang.index_word[topi.item()] == '<end>':
+            #    return result, sentence
+
+            # the predicted ID is fed back into the model
+
+            #dec_input = torch.tensor([topi.item()], device=device).unsqueeze(0)
+
+
+        return result, sentence 
     
     
+
+def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, 
+              device, beam_search=True, beam_width=3):
     
+    if beam_search == False:
+        result, sentence = greedy_decode(sentence, max_length_targ, max_length_inp, 
+                                                encoder, decoder, inp_lang, targ_lang, device)
+    else:
+        result, sentence = beam_search_decode(sentence, max_length_targ, max_length_inp, 
+                                                encoder, decoder, inp_lang, targ_lang, device, beam_width=beam_width)
+
+    print('Input: %s' % (sentence))
+    print('Predicted translation: {}'.format(result))
     
