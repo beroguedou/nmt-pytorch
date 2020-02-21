@@ -3,13 +3,13 @@ import io
 import re
 import sys
 import torch
-import queue
 import random
 import requests
 import unicodedata
 import tensorflow as tf
 from tqdm import tqdm
 from zipfile import ZipFile
+from queue import PriorityQueue
 
 
 
@@ -202,16 +202,15 @@ def greedy_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, i
 class BeamTreeNode(object):
     
     nbr = 0
-    def __init__(self, previous_node, log_proba, length, word_id):
+    def __init__(self, log_proba, length, word_id):
         
         self.__class__.nbr += 1
-        self.previous_node = previous_node
         self.log_proba = log_proba
         self.length = length
         self.word_id = word_id
  
     
-    def eval_proba(self, alpha=0.7):
+    def eval_proba(self, alpha=0.8):
 
         proba = self.log_proba / (self.length -1 + 1e-07)** alpha
         return proba
@@ -271,7 +270,8 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
         # Créer un depth level de départ
         depth_level = BeamTreeDephtLevel(previous_level=None)
         # Créer un noeud de départ 
-        node = BeamTreeNode(previous_node=None, log_proba=0, length=1, word_id=targ_lang.word_index['<start>'])
+        node = BeamTreeNode(log_proba=0, length=1, word_id=torch.tensor(targ_lang.word_index['<start>'], device=device))
+        print("deccc", node.word_id)
         # Créer un mate de départ
         mate = BeamTreeMates(parent_node=node)
         
@@ -280,10 +280,13 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
         # Ajouter le mate au depth level 
         depth_level.add_mate(mate)
         
+        # Une queue pour stocker les noeuds finaux
+        endnodes = PriorityQueue()
+        
         # Pour chaque mot à prédire
         for t in range(max_length_targ):
-            print('\t')
-            # Créer un niveau de profondeur
+            # print('\t')
+            # Créer un niveau de profondeur actuel
             depth_level = BeamTreeDephtLevel(previous_level=depth_level)
             # pour chaque mate du niveau de profondeur précédent de l'arbre  
             for mate in depth_level.previous_level.mates_list:
@@ -291,37 +294,49 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
                 for node in mate.nodes_list:
                     
                     # Prédire beam_width éléments pour chaque noeud
+                    #
+                    print(dec_input.shape)
                     predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)
+                    #dec_input = node.word_id
+                    print("toto", node.word_id)
+                    
+                    
                     top_width_values, top_width_indexes = predictions.data.topk(beam_width)
                     # Créer un mate 
                     mate = BeamTreeMates(parent_node=node)
                     # Pour chaque mot prédit créer un noeud puis rajouter le noeud au mate
                     for p, w in zip(top_width_values[0], top_width_indexes[0]):
+                        # Si un mot est end aller au noeud suivant
+                        print(targ_lang.index_word[w.item()])
+                        if targ_lang.index_word[w.item()] == '<end>':
+                            # Rajouter le noeud et sa proba à une queue
+                            score = node.eval_proba()
+                            endnodes.put((score, node))
+                            continue
+                        print("www", w)
                         log_proba = node.eval_proba() - p.item()
-                        wordid = w.item()
+                        word_id = w
                         length = max_length_targ
-                        print(log_proba)
-                        #print(mate.parent_node)
-                        n = BeamTreeNode(previous_node=mate.parent_node, log_proba=0, 
-                                         length=1, word_id=targ_lang.word_index['<start>'])
+                        # print(log_proba)
+                        n = BeamTreeNode(log_proba=log_proba, length=length, word_id=word_id)
                         
                         mate.add_node(n)
                         
                     # Ajouter le mate au depth level actuel
                     depth_level.add_mate(mate)
-            
-                        
-                        
-                        
-                        
-                        
-            if t == 2:
+          
+            if t == 1:
                 break
+        # Get the node with the least score
+        if endnodes.empty() != True:
+            print("atatata")
+            print(endnodes.get())
             
             #result += targ_lang.index_word[topi.item()] + ' '
 
             #if targ_lang.index_word[topi.item()] == '<end>':
             #    return result, sentence
+
 
             # the predicted ID is fed back into the model
 
