@@ -192,6 +192,7 @@ def greedy_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, i
 
 
         return result, sentence 
+    
 
 class BeamTreeNode(object):
     "Generic tree node."
