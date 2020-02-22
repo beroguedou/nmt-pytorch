@@ -2,6 +2,7 @@ import os
 import io
 import re
 import sys
+import copy
 import torch
 import random
 import requests
@@ -51,7 +52,7 @@ def preprocess_sentence(w):
     w = re.sub(r'[" "]+', " ", w)
 
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-    w = re.sub(r"[^a-zA-Z?.!,¿]+", " ", w)
+    w = re.sub(r"[^a-zA-Z?.!,¿]+<>", " ", w)
 
     w = w.rstrip().strip()
 
@@ -79,14 +80,15 @@ def max_length(tensor):
 
     
 def tokenize(lang):
-    lang_tokenizer = tf.keras.preprocessing.text.Tokenizer(
-      filters='')
+    lang_tokenizer = tf.keras.preprocessing.text.Tokenizer(filters='', oov_token='<unk>')
     lang_tokenizer.fit_on_texts(lang)
+    # Add <eos> word to the vocabulary
+    lang_tokenizer.index_word[0] = '<eos>'
+    lang_tokenizer.word_index['<eos>'] = 0
 
     tensor = lang_tokenizer.texts_to_sequences(lang)
 
-    tensor = tf.keras.preprocessing.sequence.pad_sequences(tensor,
-                                                         padding='post')
+    tensor = tf.keras.preprocessing.sequence.pad_sequences(tensor, padding='post')
 
     return tensor, lang_tokenizer
 
@@ -138,13 +140,11 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
         loss += criterion(decoder_output, target_tensor[:, di])
         if use_teacher_forcing:
             decoder_input = torch.unsqueeze(target_tensor[:, di], 1)  # Teacher forcing
-
         else:
             # Without teacher forcing: use its own predictions as the next input
             topv, topi = decoder_output.data.topk(1)
             # the predicted ID is fed back into the model
             decoder_input = topi.detach()
-
     
     batch_loss = (loss.item() / int(target_tensor.shape[1]))
     loss.backward()
@@ -152,11 +152,6 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
     decoder_optimizer.step()
 
     return batch_loss
-
-    
-    
-    
-    
 
 
         
@@ -198,56 +193,61 @@ def greedy_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, i
 
         return result, sentence 
 
-
 class BeamTreeNode(object):
-    
-    nbr = 0
-    def __init__(self, log_proba, length, word_id):
+    "Generic tree node."
         
-        self.__class__.nbr += 1
-        self.log_proba = log_proba
-        self.length = length
-        self.word_id = word_id
- 
-    
-    def eval_proba(self, alpha=0.8):
+    def __init__(self, name, hidden_state, wordid=1, logp=1,  children=None, parent=None):
+        self.name = name
+        self.h = hidden_state
+        self.wordid = wordid
+        self.logp = logp
+        self.children = []
+        self.parent = parent
+        self.is_leaf = True
+        self.is_end = False
+        self.length = 0
+        self.inv_path = [self.wordid.item()]
 
-        proba = self.log_proba / (self.length -1 + 1e-07)** alpha
-        return proba
+    @property
+    def path(self):
+        return self.inv_path[::-1]
+
+    def __repr__(self):
+        return self.name
+    
+    def is_child(self, node):
+        return node in self.children
         
-    
-class BeamTreeMates(object):
-    
-    nbr = 0
-    
-    def __init__(self, parent_node):
-        self.__class__.nbr += 1
-        self.nodes_list = []
-        self.parent_node = parent_node
+    def add_child(self, node):
+        assert isinstance(node, BeamTreeNode)
+        assert self.is_child(node) == False
+        self.children.append(node)
+        self.is_leaf = False
+
+    def add_parent(self, node):
+        assert isinstance(node, BeamTreeNode)
+        self.parent = node
+        self.length = node.length + 1
+        self.inv_path += node.inv_path
+
         
-    
-    def add_node(self, node):
-
-        self.nodes_list.append(node)
         
+def rec(node, P, path):
 
-class BeamTreeDephtLevel(object):
+    path.append(node.wordid.item())
     
-    nbr = 0
-    
-    def __init__(self, previous_level):
-        self.__class__.nbr += 1
-        self.mates_list = []
-        self.previous_level = previous_level
-    
-    def add_mate(self, mates):
+    if node.name != 'root':
+        P += node.parent.length
+        return rec(node.parent, P, path)
+    else:  
+        P += node.length
+        return P, path[::-1]
 
-        self.mates_list.append(mates)
-            
-    
-    
-    
-def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, device, beam_width):
+        
+        
+        
+def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, 
+                       targ_lang, device, beam_width=10, alpha=0.9):
 
     sentence = preprocess_sentence(sentence)
 
@@ -266,96 +266,72 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
         dec_hidden = enc_hidden
         dec_input = torch.tensor([[targ_lang.word_index['<start>']]], device=device)
         
+        candidates = []
+        # Créer la racinne (le noeud de départ de l'arbre)
+        node = BeamTreeNode(name='root', hidden_state=dec_hidden, wordid=dec_input, logp=0)
+        candidates.append(node)
         
-        # Créer un depth level de départ
-        depth_level = BeamTreeDephtLevel(previous_level=None)
-        # Créer un noeud de départ 
-        node = BeamTreeNode(log_proba=0, length=1, word_id=torch.tensor(targ_lang.word_index['<start>'], device=device))
-        print("deccc", node.word_id)
-        # Créer un mate de départ
-        mate = BeamTreeMates(parent_node=node)
-        
-        # Ajouter le noeud au mate
-        mate.add_node(node)
-        # Ajouter le mate au depth level 
-        depth_level.add_mate(mate)
-        
-        # Une queue pour stocker les noeuds finaux
-        endnodes = PriorityQueue()
-        
-        # Pour chaque mot à prédire
+        count = 0
+        endnodes = []
         for t in range(max_length_targ):
-            # print('\t')
-            # Créer un niveau de profondeur actuel
-            depth_level = BeamTreeDephtLevel(previous_level=depth_level)
-            # pour chaque mate du niveau de profondeur précédent de l'arbre  
-            for mate in depth_level.previous_level.mates_list:
-                # pour chaque moeud dans ce mate
-                for node in mate.nodes_list:
-                    
-                    # Prédire beam_width éléments pour chaque noeud
-                    #
-                    print(dec_input.shape)
-                    predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)
-                    #dec_input = node.word_id
-                    print("toto", node.word_id)
-                    
-                    
-                    top_width_values, top_width_indexes = predictions.data.topk(beam_width)
-                    # Créer un mate 
-                    mate = BeamTreeMates(parent_node=node)
-                    # Pour chaque mot prédit créer un noeud puis rajouter le noeud au mate
-                    for p, w in zip(top_width_values[0], top_width_indexes[0]):
-                        # Si un mot est end aller au noeud suivant
-                        print(targ_lang.index_word[w.item()])
-                        if targ_lang.index_word[w.item()] == '<end>':
-                            # Rajouter le noeud et sa proba à une queue
-                            score = node.eval_proba()
-                            endnodes.put((score, node))
-                            continue
-                        print("www", w)
-                        log_proba = node.eval_proba() - p.item()
-                        word_id = w
-                        length = max_length_targ
-                        # print(log_proba)
-                        n = BeamTreeNode(log_proba=log_proba, length=length, word_id=word_id)
-                        
-                        mate.add_node(n)
-                        
-                    # Ajouter le mate au depth level actuel
-                    depth_level.add_mate(mate)
-          
-            if t == 1:
-                break
-        # Get the node with the least score
-        if endnodes.empty() != True:
-            print("atatata")
-            print(endnodes.get())
+            all_nodes = PriorityQueue()
+            for n in candidates:
+                if n.is_leaf and not n.is_end:
+                    # étendre le noeud (faire les prédictions dessus)
+                    #print(n.wordid)
+                    predictions, dec_hidden, attention_weights = decoder(n.wordid, n.h, enc_out)
+                    # Pour signaler que le noeud est déjà étendu (utilisé)
+                    n.is_leaf = False
+                    # prendre les top beam width
+                    top_width_v, top_width_i = predictions.data.topk(beam_width)
+                    # Créer beam width noeuds pour stocker les prédictions et les rajouter à 
+                    # la liste de noeuds à scorer
+                    for val, ind in zip(top_width_v[0], top_width_i[0]):
+                        count += 1
+                        dec_input = torch.tensor([[ind.item()]], device=device)
+                        node = BeamTreeNode(name=str(count), hidden_state=dec_hidden, wordid=dec_input, logp= -val + n.logp)
+                        # Rajouter le noeud à la priority queue
+                        all_nodes.put((node.logp, node))
+                        # Indiquer que les nouveaux noeuds sont des enfants du noeud initial 
+                        n.add_child(node)
+                        node.add_parent(n)
+                        # Si on prédit la fin ou que la longueur maximale est atteinte
+                        if targ_lang.index_word[ind.item()] == '<end>':
+                            node.is_end = True 
+                            endnodes.append(node)
+       
+            # Retenir que les beam width meilleurs           
+            candidates = [all_nodes.get() for step in range(beam_width)]
+            candidates = [node for _, node in candidates]
             
-            #result += targ_lang.index_word[topi.item()] + ' '
+        # Last step before the result 
+        final_queue = PriorityQueue()
+        final_candidates = candidates + endnodes
+        # Put all final candidates nodes in a priority queue and choose the best one
+        for n in final_candidates:
+            score = n.logp / (n.length ** alpha)
+            final_queue.put((score, n))
+        # Choose the best node  
+        _, node = final_queue.get()
+        # Find the path
+        for elem in node.path:
+            if elem != 0:
+                result += targ_lang.index_word[elem] + ' '
 
-            #if targ_lang.index_word[topi.item()] == '<end>':
-            #    return result, sentence
-
-
-            # the predicted ID is fed back into the model
-
-            #dec_input = torch.tensor([topi.item()], device=device).unsqueeze(0)
-
-
-        return result, sentence 
-    
-    
+        return result, sentence         
+        
+        
 
 def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, 
-              device, beam_search=True, beam_width=3):
+              device, beam_search=True, beam_width=3, alpha=0.3):
     
     if beam_search == False:
         result, sentence = greedy_decode(sentence, max_length_targ, max_length_inp, 
                                                 encoder, decoder, inp_lang, targ_lang, device)
     else:
         result, sentence = beam_search_decode(sentence, max_length_targ, max_length_inp, 
-                                                encoder, decoder, inp_lang, targ_lang, device, beam_width=beam_width)
+                                              encoder, decoder, inp_lang, targ_lang, device,
+                                              beam_width=beam_width, alpha=alpha)
 
     print('Input: %s' % (sentence))
     print('Predicted translation: {}'.format(result))
