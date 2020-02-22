@@ -71,7 +71,10 @@ Le maxout modèle est simplement une architecture feed-forward (comme un MLP) qu
 Ian GOODFELLOW et Yoshua BENGIO ont démontré que c'est un approximateur universel. Mais l'incovénient est qu'il double le nombre de paramètres donc j'utiliserai plutôt une Relu à la place.
 
 
+<h3> Inférence </h3>
+<p>Une fois le modèle entrainé au moment de l'inférence (utilisation du modèle pour de la traduction de nouvelles séquences, j'utilise dans ce projet une technique complémentaire appelée "beam search" dont je vous propose aussi une implémentation ici.</p>
 
+<img src="WhatsApp Image 2020-02-22 at 17.21.33.jpeg" />
 
 
 
