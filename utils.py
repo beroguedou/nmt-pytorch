@@ -212,6 +212,12 @@ class BeamTreeNode(object):
     @property
     def path(self):
         return self.inv_path[::-1]
+    
+    def __lt__(self, other):
+        return self.logp.item() < other.logp.item() 
+    
+    def __eq__(self, other):
+        return self.logp.item() == other.logp.item() 
 
     def __repr__(self):
         return self.name
@@ -248,7 +254,7 @@ def rec(node, P, path):
         
         
 def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, 
-                       targ_lang, device, beam_width=10, alpha=0.9):
+                       targ_lang, device, nb_candidates, beam_width, alpha):
 
     sentence = preprocess_sentence(sentence)
 
@@ -269,7 +275,7 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
         
         candidates = []
         # Créer la racinne (le noeud de départ de l'arbre)
-        node = BeamTreeNode(name='root', hidden_state=dec_hidden, wordid=dec_input, logp=0)
+        node = BeamTreeNode(name='root', hidden_state=dec_hidden, wordid=dec_input, logp=torch.tensor(0, device=device))
         candidates.append(node)
         
         count = 0
@@ -283,16 +289,22 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
                     predictions, dec_hidden, attention_weights = decoder(n.wordid, n.h, enc_out)
                     # Pour signaler que le noeud est déjà étendu (utilisé)
                     n.is_leaf = False
-                    # prendre les top beam width
-                    top_width_v, top_width_i = predictions.data.topk(beam_width)
+                    # prendre le nombre de candidats choisis 
+                    top_width_v, top_width_i = predictions.data.topk(nb_candidates)
                     # Créer beam width noeuds pour stocker les prédictions et les rajouter à 
                     # la liste de noeuds à scorer
                     for val, ind in zip(top_width_v[0], top_width_i[0]):
                         count += 1
                         dec_input = torch.tensor([[ind.item()]], device=device)
-                        node = BeamTreeNode(name=str(count), hidden_state=dec_hidden, wordid=dec_input, logp= -val + n.logp)
+                        logproba = -val + n.logp
+                        node = BeamTreeNode(name=str(count), hidden_state=dec_hidden, wordid=dec_input, logp=logproba)
                         # Rajouter le noeud à la priority queue
-                        all_nodes.put((node.logp, node))
+                        all_nodes.put(node)
+                        #try:
+                            #all_nodes.put((logproba, node))
+                        #    all_nodes.put(node)
+                        #except:
+                         #   print("c xa ---{}->".format(val), node.logp.item())
                         # Indiquer que les nouveaux noeuds sont des enfants du noeud initial 
                         n.add_child(node)
                         node.add_parent(n)
@@ -303,12 +315,14 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
        
             # Retenir que les beam width meilleurs           
             candidates = [all_nodes.get() for step in range(beam_width)]
-            candidates = [node for _, node in candidates]
+            #candidates = [node for _, node in candidates]
+            candidates = [node for node in candidates]
             
         # Last step before the result 
         final_queue = PriorityQueue()
         final_candidates = candidates + endnodes
-        # Put all final candidates nodes in a priority queue and choose the best one
+        # Put all final candidates nodes in a priority queue and choose the best one based 
+        # on the score and not on the logp
         for n in final_candidates:
             score = n.logp / (n.length ** alpha)
             final_queue.put((score, n))
@@ -324,7 +338,7 @@ def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decod
         
 
 def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, targ_lang, 
-              device, beam_search=True, beam_width=3, alpha=0.3):
+              device, beam_search=True, beam_width=3, alpha=0.3, nb_candidates=50):
     
     if beam_search == False:
         result, sentence = greedy_decode(sentence, max_length_targ, max_length_inp, 
@@ -332,7 +346,7 @@ def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_l
     else:
         result, sentence = beam_search_decode(sentence, max_length_targ, max_length_inp, 
                                               encoder, decoder, inp_lang, targ_lang, device,
-                                              beam_width=beam_width, alpha=alpha)
+                                              beam_width=beam_width, nb_candidates=nb_candidates, alpha=alpha)
 
     print('Input: %s' % (sentence))
     print('Predicted translation: {}'.format(result))
