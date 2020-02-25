@@ -7,6 +7,7 @@ import torch
 import random
 import requests
 import unicodedata
+import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 from zipfile import ZipFile
@@ -145,7 +146,7 @@ def train_step(input_tensor, target_tensor, encoder, decoder, encoder_optimizer,
             topv, topi = decoder_output.data.topk(1)
             # the predicted ID is fed back into the model
             decoder_input = topi.detach()
-    
+
     batch_loss = (loss.item() / int(target_tensor.shape[1]))
     loss.backward()
     encoder_optimizer.step()
@@ -236,22 +237,7 @@ class BeamTreeNode(object):
         self.parent = node
         self.length = node.length + 1
         self.inv_path += node.inv_path
-
-        
-        
-def rec(node, P, path):
-
-    path.append(node.wordid.item())
     
-    if node.name != 'root':
-        P += node.parent.length
-        return rec(node.parent, P, path)
-    else:  
-        P += node.length
-        return P, path[::-1]
-
-        
-        
         
 def beam_search_decode(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_lang, 
                        targ_lang, device, nb_candidates, beam_width, alpha):
@@ -351,14 +337,30 @@ def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_l
     print('Input: %s' % (sentence))
     print('Predicted translation: {}'.format(result))
     
+    
+    
+def load_glove_weights(glove_dir, vocab_size, word_index, embedding_dim = 100):
+    
+    embeddings_index = {}
+    
+    with open(glove_dir, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    for line in lines:
+        values = line.split()
+        word = values[0]
+        coefs = np.asarray(values[1:], dtype='float32')
+        embeddings_index[word] = coefs
 
+    print('Found %s word vectors.' % len(embeddings_index))
+    embedding_matrix = np.zeros((vocab_size, embedding_dim))
+    
+    for word, i in word_index.items():
+        if i < vocab_size:
+            embedding_vector = embeddings_index.get(word)
+            if embedding_vector is not None:
+                embedding_matrix[i] = embedding_vector
+                   
+    return embedding_matrix
     
     
-def load_faxtText_vectors(fname):
-    fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
-    n, d = map(int, fin.readline().split())
-    data = {}
-    for line in fin:
-        tokens = line.rstrip().split(' ')
-        data[tokens[0]] = map(float, tokens[1:])
-    return data
