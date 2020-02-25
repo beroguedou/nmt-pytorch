@@ -351,3 +351,14 @@ def translate(sentence, max_length_targ, max_length_inp, encoder, decoder, inp_l
     print('Input: %s' % (sentence))
     print('Predicted translation: {}'.format(result))
     
+
+    
+    
+def load_faxtText_vectors(fname):
+    fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
+    n, d = map(int, fin.readline().split())
+    data = {}
+    for line in fin:
+        tokens = line.rstrip().split(' ')
+        data[tokens[0]] = map(float, tokens[1:])
+    return data
