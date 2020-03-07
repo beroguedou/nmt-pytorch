@@ -90,7 +90,7 @@ class LuongAttentionConcat(nn.Module):
 
         query = torch.squeeze(query, 0)
         query = torch.unsqueeze(query, 1)
-        query = query.repeat(1, 42, 1)
+        query = query.repeat(1, values.shape[1], 1)
         cat = torch.cat((values, query), dim=2)
         score = self.V(torch.tanh(self.W(cat)))
         # attention_weights shape == (batch_size, max_length, 1)
